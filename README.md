@@ -27,8 +27,12 @@ for pixelwise water detection
 
 -> OpenCv2
 
-# Instruction command:
+# Use instructions:
+
+First install the required package:
 
 -> pip install -r requirements.txt
 
--> python 
+Second run the tool with:
+
+-> python "name-of-file"
