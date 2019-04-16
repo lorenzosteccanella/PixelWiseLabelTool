@@ -26,14 +26,16 @@ import matplotlib.pyplot as plt
 import os
 
 
-# In[2]:
+# In[10]:
 
 
 class SegmentationGUI(Frame):
 
     def __init__(self,master):
+        
+        self.root=master
         #the name of the window
-        master.title("Segmentation Tool")
+        self.root.title("Segmentation Tool")
         self.panelA = None
         #vector of all images in the same folder
         self.images = None
@@ -60,49 +62,91 @@ class SegmentationGUI(Frame):
         self.slider2=None
         self.slider3=None
         
-    
-        self.main_window()
+        self.panel_height = None
+        self.panel_width = None
+        
+        self.intro_window()
+        #self.main_window()
+        
+    def intro_window(self):
+        
+        self.panel0 = Canvas(self.root, width=500, height=500, background="bisque")
+        
+        self.T = Text(self.root, height=15, width=70)
+        self.T.insert(END, "SEGMENTATION TOOL \n \n" + 
+                           "This is a tool used to label to a pixelwise level an image\n\n" + 
+                           "main comands: \n \n" + 
+                           "1- Drag and drop right mouse to select areas \n" +
+                           "2- mouse wheel to zoom the image \n" +
+                           "3- left click to drag the image in the window \n" +
+                           "\n \n First step select a resolution in this window in the commands below \n and press continue")
+        
+        self.panel0.grid(row=1,column=1,columnspan=4,rowspan=4)
+        self.T.grid(row=1,column=1,columnspan=4,sticky='WE')
+        
+        self.panel_width=IntVar()
+        self.panel_width.set(800)
+        RadioButtonChoiceTheWidthResolution1=Radiobutton(self.root, text="width -> 800", padx = 20, variable=self.panel_width, value=800)
+        RadioButtonChoiceTheWidthResolution2=Radiobutton(self.root, text="width -> 1200", padx = 20, variable=self.panel_width, value=1200)
+        RadioButtonChoiceTheWidthResolution3=Radiobutton(self.root, text="width -> 1900", padx = 20, variable=self.panel_width, value=1900)
+        
+        RadioButtonChoiceTheWidthResolution1.grid(row=2,column=1,columnspan=1,sticky='WE')
+        RadioButtonChoiceTheWidthResolution2.grid(row=3,column=1,columnspan=1,sticky='WE')
+        RadioButtonChoiceTheWidthResolution3.grid(row=4,column=1,columnspan=1,sticky='WE')
+        
+        self.panel_height=IntVar()
+        self.panel_height.set(600)
+        RadioButtonChoiceTheHeightResolution1=Radiobutton(self.root, text="height -> 600", padx = 20, variable=self.panel_height, value=600)
+        RadioButtonChoiceTheHeightResolution2=Radiobutton(self.root, text="height -> 700", padx = 20, variable=self.panel_height, value=700)
+        RadioButtonChoiceTheHeightResolution3=Radiobutton(self.root, text="height -> 900", padx = 20, variable=self.panel_height, value=900)
+        
+        RadioButtonChoiceTheHeightResolution1.grid(row=2,column=2,columnspan=1,sticky='WE')
+        RadioButtonChoiceTheHeightResolution2.grid(row=3,column=2,columnspan=1,sticky='WE')
+        RadioButtonChoiceTheHeightResolution3.grid(row=4,column=2,columnspan=1,sticky='WE')
+        
+        btnContinue = Button(self.root, text="Continue", command=self.main_window)
+        btnContinue.grid(row=3,column=3,columnspan=1)
         
         
     def main_window(self):
         # create a button, then when pressed, will trigger a file chooser
         # dialog and allow the user to select an input image; then add the
         # button the GUI
-        btnSelectImage = Button(root, text="Select an image", command=self.open_image)
-        btnReset = Button(root, text="Reset", command=self.reset_image)
-        btnOpenMask = Button(root, text="Open a Mask", command=self.open_mask)
+        btnSelectImage = Button(self.root, text="Select an image", command=self.open_image)
+        btnReset = Button(self.root, text="Reset", command=self.reset_image)
+        btnOpenMask = Button(self.root, text="Open a Mask", command=self.open_mask)
         #Next image button
-        btnNext = Button(root, text='Next', command=self.Next)
+        btnNext = Button(self.root, text='Next', command=self.Next)
         #Previous image button
-        btnPrevious = Button(root, text='Previous', command=self.Previous)
+        btnPrevious = Button(self.root, text='Previous', command=self.Previous)
         #Zoom + button
-        btnZoomP = Button(root, text='Zoom +', command=self.zoomerPiuBtn)
+        btnZoomP = Button(self.root, text='Zoom +', command=self.zoomerPiuBtn)
         #Zoom - button
-        btnZoomM = Button(root, text='Zoom -', command=self.zoomerMenoBtn)
+        btnZoomM = Button(self.root, text='Zoom -', command=self.zoomerMenoBtn)
         
-        self.panelA = Canvas(root, width=1200, height=600, background="bisque")
+        self.panelA = Canvas(self.root, width=self.panel_width.get(), height=self.panel_height.get(), background="bisque")
         self.segment_type_choice=IntVar()
         self.segment_type_choice.set(1)
-        RadioButton1=Radiobutton(root, text="SLIC", padx = 20, variable=self.segment_type_choice, value=1,command=self.radioBtn_refresh)
-        RadioButton2=Radiobutton(root, text="felzenszwalb", padx = 20, variable=self.segment_type_choice, value=2,command=self.radioBtn_refresh)
-        RadioButton3=Radiobutton(root, text="quickshift(slow)", padx = 20, variable=self.segment_type_choice, value=3,command=self.radioBtn_refresh)
+        RadioButton1=Radiobutton(self.root, text="SLIC", padx = 20, variable=self.segment_type_choice, value=1,command=self.radioBtn_refresh)
+        RadioButton2=Radiobutton(self.root, text="felzenszwalb", padx = 20, variable=self.segment_type_choice, value=2,command=self.radioBtn_refresh)
+        RadioButton3=Radiobutton(self.root, text="quickshift(slow)", padx = 20, variable=self.segment_type_choice, value=3,command=self.radioBtn_refresh)
         self.mask_type_choice=IntVar()
         self.mask_type_choice.set(1)
-        RadioButtonChoiceTheMask1=Radiobutton(root, text="Water", padx = 20, variable=self.mask_type_choice, value=1)
-        RadioButtonChoiceTheMask2=Radiobutton(root, text="Other", padx = 20, variable=self.mask_type_choice, value=2)
-        RadioButtonChoiceTheMask3=Radiobutton(root, text="Undo", padx = 20, variable=self.mask_type_choice, value=3)
-        btnShow = Button(root, text='Show', command=self.slider_refresh)
-        self.slider1 = Scale(root, from_=0, to=5000, orient=HORIZONTAL)
-        self.slider2 = Scale(root, from_=0, to=100, orient=HORIZONTAL)
-        self.slider3 = Scale(root, from_=0, to=30, orient=HORIZONTAL, resolution =   0.5)
+        RadioButtonChoiceTheMask1=Radiobutton(self.root, text="Water", padx = 20, variable=self.mask_type_choice, value=1)
+        RadioButtonChoiceTheMask2=Radiobutton(self.root, text="Other", padx = 20, variable=self.mask_type_choice, value=2)
+        RadioButtonChoiceTheMask3=Radiobutton(self.root, text="Undo", padx = 20, variable=self.mask_type_choice, value=3)
+        btnShow = Button(self.root, text='Show', command=self.slider_refresh)
+        self.slider1 = Scale(self.root, from_=0, to=5000, orient=HORIZONTAL)
+        self.slider2 = Scale(self.root, from_=0, to=100, orient=HORIZONTAL)
+        self.slider3 = Scale(self.root, from_=0, to=30, orient=HORIZONTAL, resolution =   0.5)
         self.slider1.set(150)
         self.slider2.set(20)
         self.slider3.set(1)       
         # Save Mask Button
-        btnSave = Button(root, text='Save Mask', command=self.save_mask)
+        btnSave = Button(self.root, text='Save Mask', command=self.save_mask)
         # Adjust the Mask
-        btnAdjust = Button(root, text='Adjust the Mask', command=self.adjust_mask)
-        self.text = Text(root,width=100, height=1)
+        btnAdjust = Button(self.root, text='Adjust the Mask', command=self.adjust_mask)
+        self.text = Text(self.root,width=100, height=1)
 
         
         #set the position of the widget in the window
@@ -149,7 +193,7 @@ class SegmentationGUI(Frame):
             self.mask=cv2.resize(self.mask,(self.width_original, self.height_original), interpolation = cv2.INTER_CUBIC)
             self.image=self.image_original
             height,width=self.image.shape[:2]
-            self.panelB = Canvas(self.t, width=width, height=height, background="bisque")
+            self.panelB = Canvas(self.t, width=self.panel_width.get(), height=self.panel_height.get(), background="bisque")
             imageOUT = cv2.bitwise_or(self.image,self.mask)
             #imageOUT = cv2.addWeighted(self.image,0.6,self.mask,0.3,0)
             #imageOUT=np.where(self.mask==(0,0,0),self.image,self.mask)
@@ -191,7 +235,8 @@ class SegmentationGUI(Frame):
             
         
     def move_start_adjust_mask(self,event):
-        self.panelB.scan_mark(event.x, event.y)    
+        self.panelB.scan_mark(event.x, event.y)  
+        
     def move_move_adjust_mask(self,event):
         self.panelB.scan_dragto(event.x, event.y, gain=1)
             
@@ -280,10 +325,10 @@ class SegmentationGUI(Frame):
         self.path=path
         # ensure a file path was selected
         if len(path) > 0:
-            #get the root of the path
-            pathRoot=path[:path.rfind('/')] + '/*'+path[path.rfind('.'):]
+            #get the self.root of the path
+            pathroot=path[:path.rfind('/')] + '/*'+path[path.rfind('.'):]
             #open all the images in the path
-            self.images = glob.glob(pathRoot)
+            self.images = glob.glob(pathroot)
             #find the index of the image selected for trace the previous and next images
             self.index_image=self.find_index_selected(self.images,path)
             image = cv2.imread(path)
@@ -311,10 +356,10 @@ class SegmentationGUI(Frame):
         if(self.path!=None):
             path=self.path
             if len(path) > 0:
-                #get the root of the path
-                pathRoot=path[:path.rfind('/')] + '/*'+path[path.rfind('.'):]
+                #get the self.root of the path
+                pathroot=path[:path.rfind('/')] + '/*'+path[path.rfind('.'):]
                 #open all the images in the path
-                self.images = glob.glob(pathRoot)
+                self.images = glob.glob(pathroot)
                 #find the index of the image selected for trace the previous and next images
                 self.index_image=self.find_index_selected(self.images,path)
                 image = cv2.imread(path)
@@ -538,6 +583,7 @@ class SegmentationGUI(Frame):
     #move the image in the window
     def move_start(self,event):
         self.panelA.scan_mark(event.x, event.y)
+        
     def move_move(self,event):
         self.panelA.scan_dragto(event.x, event.y, gain=1)
         
@@ -676,4 +722,16 @@ app=SegmentationGUI(root)
 #start the GUI loop
 root.mainloop()
     
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
